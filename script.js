@@ -10,6 +10,10 @@ function getLabelMonth(){
   return months;
 }
 
+function add(a,b){
+  return a+b;
+}
+
 function getDataSales(data){
 
   var monthProfit = new Array(12).fill(0);
@@ -89,6 +93,15 @@ function getDataServer(){
       var sellers = getDataSeller(data);
       var nameSalesman = Object.keys(sellers);
       var amountSeller = Object.values(sellers);
+
+      //calcolo i valori in %
+
+      var totAmount = amountSeller.reduce(add);
+      console.log(totAmount);
+      for (var i = 0; i < amountSeller.length; i++) {
+        amountSeller[i] = Math.floor((amountSeller[i]/totAmount)*100);
+      }
+      console.log(amountSeller);
       var ctxDoughnut = document.getElementById('myChartDoughnut').getContext('2d');
       var myChartDoughnut = new Chart(ctxDoughnut, {
           type: 'doughnut',
