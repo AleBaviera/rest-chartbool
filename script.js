@@ -142,7 +142,7 @@ function addSale(){
   console.log(selectedSeller);
   var selectedMonth = $('#selMonth').val();
   console.log(selectedMonth);
-  var newAmount = parseInt($('input').val()); // restituisce un numero
+  var newAmount = Number($('input').val()); // restituisce un numero
   console.log(newAmount);
 
 
@@ -155,7 +155,7 @@ function addSale(){
     url:'http://157.230.17.132:4010/sales',
     method:'POST',
     data: {
-      amount : parseInt(newAmount), //restituisce una stringa!!
+      amount : Number(newAmount), //restituisce una stringa!!
       salesman : selectedSeller,
       date : '01/' + month + '/2017'
     },
