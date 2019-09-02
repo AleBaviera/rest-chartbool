@@ -2,13 +2,12 @@ function init() {
 
     getDataServer();
     $('#addSale').click(addSale);
-    // postDataServer();
+
 }
 
 function getLabelMonth(){
 
   var months = moment.months();
-  console.log(months);
   return months;
 }
 
@@ -19,19 +18,14 @@ function add(a,b){
 function getDataSales(data){
 
   var monthProfit = new Array(12).fill(0);
-  console.log(monthProfit);
 
   for (var i = 0; i < data.length; i++) {
     var d = data[i];
     var amount = Number(d.amount);
     var monthSales = d.date;
     var month = moment(monthSales, 'DD/MM/YYYY').month();
-    console.log(month);
-    console.log(monthSales);
-
 
     monthProfit[month]+= amount;
-
   }
   return monthProfit;
 }
@@ -46,20 +40,11 @@ function getDataSeller(data){
     var seller = d.salesman;
     var amount = Number(d.amount);
 
-
-
     if (!sellers[seller]) {
-
       sellers[seller] = 0;
-
     }
 
-    console.log(sellers);
-      sellers[seller] += amount;
-
-
-    console.log(sellers);
-
+    sellers[seller] += amount;
   }
   return sellers;
 
@@ -67,22 +52,20 @@ function getDataSeller(data){
 
 function selSeller(data){
   var sellers = Object.keys(getDataSeller(data));
-  console.log(sellers);
   for (var i = 0; i < sellers.length; i++) {
       $("#selSeller").append($('<option>', {
-    value: sellers[i],
-    text: sellers[i]
+        value: sellers[i],
+        text: sellers[i]
       }));
   }
 }
 
 function selMonth(data){
   var months = getLabelMonth();
-  console.log(months);
   for (var i = 0; i < months.length; i++) {
       $("#selMonth").append($('<option>', {
-    value: months[i],
-    text: months[i]
+        value: months[i],
+        text: months[i]
       }));
   }
 }
@@ -90,7 +73,6 @@ function selMonth(data){
 function printLineChart(data){
   var monthSales = getDataSales(data);
   var months = getLabelMonth();
-  console.log(monthSales, months);
   var ctx = document.getElementById('myChart').getContext('2d');
   var myChart = new Chart(ctx, {
       type: 'line',
@@ -99,8 +81,6 @@ function printLineChart(data){
           datasets: [{
               label: '# Sales',
               data: monthSales,
-
-
           }]
       },
 
@@ -128,6 +108,55 @@ function printPieChart(data){
           datasets: [{
               label: '# Sales',
               data: amountSeller,
+
+
+          }]
+      },
+
+  });
+}
+function getDataQuarter(data){
+  console.log(data);
+
+
+  var dataQuarter = {
+    Q1 : 0,
+    Q2 : 0,
+    Q3 : 0,
+    Q4 : 0
+  };
+
+  for (var i = 0; i < data.length; i++) {
+      var d = data[i];
+      var month = Number(moment(d.date).month());
+      var amount = Number(d.amount);
+
+      if (month < 2) {
+        dataQuarter['Q1']+= amount;
+      } else if (month < 5){
+        dataQuarter['Q2']+= amount;
+      }else if (month < 8){
+        dataQuarter['Q3']+= amount;
+      }else {
+        dataQuarter['Q4']+= amount;
+      }
+
+  }
+  console.log(dataQuarter);
+  return dataQuarter;
+}
+
+function printBarChart(data){
+  var dataQuarter = Object.values(getDataQuarter(data));
+  console.log(dataQuarter);
+  var ctxDoughnut = document.getElementById('myChartBar').getContext('2d');
+  var myChartDoughnut = new Chart(ctxDoughnut, {
+      type: 'bar',
+      data: {
+          labels: ['quarter1','quarter2', 'quarter3', 'quarter4'],
+          datasets: [{
+              label: '# Sales',
+              data: dataQuarter,
 
 
           }]
@@ -179,17 +208,18 @@ function getDataServer(){
     method:'GET',
 
     success: function(data){
-      console.log(data);
+
+      for (var i = 0; i < data.length; i++) {
+        var date = data[i].date.split('/');
+        data[i].date = date[2] + '-' + date[1] + '-' + date[0];
+        data[i].amount = Number(data[i].amount);
+      }
 
       printLineChart(data);
       printPieChart(data);
       selSeller(data);
       selMonth(data);
-
-
-
-
-
+      printBarChart(data);
     },
     error: function(){
       alert('errore');
